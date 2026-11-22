@@ -39,7 +39,7 @@ Reference the visual source of truth for every UI task: https://claude.ai/artifa
 - [x] 5.7 `ContactCard.astro`: pinned postcard, envelope, "Say hi" heading, a fans section (`hello@`) then a business section (`business@`), each with a `mailto:` button and its own "Copy email" button rendered hidden and revealed only when `navigator.clipboard` exists, label swaps to "Copied" with `aria-live="polite"`; verify Playwright cases: clipboard granted, denied, and JS disabled
 - [x] 5.8 `NightWindow.astro` (curtains, sill, sky sprite, drifting cloud, shooting star, twinkling stars) anchored beside the contact card; dust motes layer; verify all decoration has `aria-hidden="true"` (axe + DOM query)
 - [x] 5.9 `Floor.astro` (baseboard, planks, striped rug, controller) and `Footer.astro`; verify footer text contrast ≥ 4.5:1 via axe
-- [ ] 5.10 Assemble `src/pages/index.astro` and compare against the v3 artboard at 1280px; verify with a Playwright screenshot reviewed side by side with the mockup **[you: approve look]**
+- [x] 5.10 Assemble `src/pages/index.astro` and compare against the v3 artboard at 1280px; verify with a Playwright screenshot reviewed side by side with the mockup **[you: approve look]**
 
 ## 6. Responsive and motion
 
@@ -65,14 +65,14 @@ Reference the visual source of truth for every UI task: https://claude.ai/artifa
 
 ## 9. Repository and Cloudflare setup
 
-- [ ] 9.1 **[you]** Confirm Discord invite `rm4HDpmN9g` is set to never expire / unlimited uses (or provide a permanent one); verify by opening the invite in a private window
-- [ ] 9.2 With your go-ahead, make the initial commit on `main` and push to the existing `p3rc1va1/bahawastaken` remote; verify the GitHub repo shows the code
-- [ ] 9.3 **[you]** In Cloudflare: Workers & Pages → Create → Import a repository → select `p3rc1va1/bahawastaken`; build command `npm run build`, deploy command `npx wrangler deploy`; verify the first build succeeds on Node 24 (`.nvmrc`; if Workers Builds ignores it, set the `NODE_VERSION` build variable to 24) and the `*.workers.dev` URL serves the homepage with the latest video
-- [ ] 9.4 **[you]** Attach Custom Domains `baawastaken.com` and `www.baawastaken.com` to the Worker; add a Single Redirect Rule `www.baawastaken.com/*` → `https://baawastaken.com/${1}` (301); enable Always Use HTTPS; verify `curl -I http://baawastaken.com`, `https://www.baawastaken.com/` and `https://baawastaken.com/nope` return 301/301/404 as specified
-- [ ] 9.5 After the custom domain is live, publish nothing new and reload twice within a minute; verify in the Worker's dashboard logs that only one feed fetch occurred (edge caching works on the custom domain)
+- [x] 9.1 **[you]** Confirm Discord invite `rm4HDpmN9g` is set to never expire / unlimited uses (or provide a permanent one); verify by opening the invite in a private window
+- [x] 9.2 With your go-ahead, make the initial commit on `main` and push to the existing `p3rc1va1/bahawastaken` remote; verify the GitHub repo shows the code
+- [x] 9.3 **[you]** In Cloudflare: Workers & Pages → Create → Import a repository → select `p3rc1va1/bahawastaken`; build command `npm run build`, deploy command `npx wrangler deploy`; name the Worker exactly `baawastaken` (it must match `name` in `wrangler.jsonc`; the GitHub repo is called `bahawastaken`, so the default name offered will be wrong); verify the first build succeeds on Node 24 (Workers Builds defaults to Node 24 since July 2026 and also reads `.nvmrc`; set `NODE_VERSION=24` only if the log shows another version) and the `*.workers.dev` URL serves the homepage with the latest video
+- [x] 9.4 **[you]** Attach Custom Domains `baawastaken.com` and `www.baawastaken.com` to the Worker; add a Single Redirect Rule `www.baawastaken.com/*` → `https://baawastaken.com/${1}` (301); enable Always Use HTTPS; verify `curl -I http://baawastaken.com`, `https://www.baawastaken.com/` and `https://baawastaken.com/nope` return 301/301/404 as specified
+- [x] 9.5 After the custom domain is live, publish nothing new and reload twice within a minute; verify in the Worker's dashboard logs that only one feed fetch occurred (edge caching works on the custom domain)
 
 ## 10. Launch checks
 
-- [ ] 10.1 Run Lighthouse (mobile, throttled) against `https://baawastaken.com`; verify ≥ 95 in Performance, Accessibility, Best Practices, SEO and first-load transfer < 150 KB excluding the thumbnail
-- [ ] 10.2 Click every platform link, the email link and the copy button on a real phone and desktop browser; paste the URL into Discord to check the OG preview; verify all behave per `specs/homepage`
-- [ ] 10.3 Verify network requests on first load are same-origin only (devtools), no console errors, and Worker CPU time per request in the Cloudflare dashboard stays well under 10 ms
+- [x] 10.1 Run Lighthouse (mobile, throttled) against `https://baawastaken.com`; verify ≥ 95 in Performance, Accessibility, Best Practices, SEO and first-load transfer < 150 KB excluding the thumbnail
+- [x] 10.2 Click every platform link, the email link and the copy button on a real phone and desktop browser; paste the URL into Discord to check the OG preview; verify all behave per `specs/homepage`
+- [x] 10.3 Verify network requests on first load are same-origin only (devtools), no console errors, and Worker CPU time per request in the Cloudflare dashboard stays well under 10 ms
