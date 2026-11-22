@@ -29,7 +29,7 @@ export const socials: readonly Social[] = [
   {
     id: 'instagram',
     name: 'Instagram',
-    description: '@baawastakenyt',
+    description: 'Short clips',
     url: 'https://www.instagram.com/baawastakenyt',
     shelf: 1,
     sprite: 'instagram',
