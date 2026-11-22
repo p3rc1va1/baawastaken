@@ -1,0 +1,82 @@
+---
+import type { SpriteDef } from '../sprites/types';
+import { spriteRects } from '../lib/sprite-rects';
+
+interface Props {
+  /** The sprite to draw. */
+  sprite: SpriteDef;
+  /** Accessible name. Omit for decoration (the sprite is then hidden from assistive technology). */
+  label?: string;
+  /** Alternate the two frames (two-frame sprites only). Ignored when the visitor prefers reduced motion. */
+  animate?: boolean;
+  /** CSS time for one full loop of an animated sprite, e.g. "3.4s". */
+  duration?: string;
+  class?: string;
+}
+
+const { sprite, label, animate = false, duration, class: className } = Astro.props;
+const { w, h, palette, frames } = sprite;
+
+const size = `width: calc(var(--px) * ${w}); height: calc(var(--px) * ${h});`;
+const a11y = label
+  ? ({ role: 'img', 'aria-label': label } as const)
+  : ({ 'aria-hidden': 'true' } as const);
+const frameClass = (i: number) => ['sprite-frame', i === 0 ? 'fa' : 'fb', animate ? 'run' : ''].filter(Boolean).join(' ');
+const frameStyle = duration ? `animation-duration: ${duration}` : undefined;
+const rects = frames.map((frame) => spriteRects(frame, palette));
+---
+
+{
+  frames.length === 1 ? (
+    <svg
+      class:list={['sprite', className]}
+      style={size}
+      viewBox={`0 0 ${w} ${h}`}
+      width={w * 4}
+      height={h * 4}
+      focusable="false"
+      {...a11y}
+    >
+      {rects[0]!.map((r) => (
+        <rect x={r.x} y={r.y} width={r.w} height={r.h} fill={r.fill} />
+      ))}
+    </svg>
+  ) : (
+    <span class:list={['sprite-stack', className]} style={size} {...a11y}>
+      {rects.map((frame, i) => (
+        <svg
+          class={frameClass(i)}
+          style={frameStyle}
+          viewBox={`0 0 ${w} ${h}`}
+          width={w * 4}
+          height={h * 4}
+          focusable="false"
+          aria-hidden="true"
+        >
+          {frame.map((r) => (
+            <rect x={r.x} y={r.y} width={r.w} height={r.h} fill={r.fill} />
+          ))}
+        </svg>
+      ))}
+    </span>
+  )
+}
+
+<style>
+  .sprite {
+    flex: none;
+  }
+
+  .sprite-stack {
+    position: relative;
+    display: block;
+    flex: none;
+  }
+
+  .sprite-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

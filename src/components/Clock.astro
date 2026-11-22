@@ -1,0 +1,17 @@
+---
+import Sprite from './Sprite.astro';
+import { sprites } from '../sprites';
+---
+
+<div class="clock" aria-hidden="true">
+  <Sprite sprite={sprites.clock} />
+  <Sprite class="pendulum" sprite={sprites.pendulum} animate />
+</div>
+
+<style>
+  .clock {
+    display: flex;
+    flex-direction: column;
+    width: calc(var(--px) * 12);
+  }
+</style>

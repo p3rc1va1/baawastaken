@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <id>yt:channel:EXAMPLE</id>
+ <yt:channelId>EXAMPLE</yt:channelId>
+ <title>Example Channel</title>
+ <published>2099-01-01T00:00:00+00:00</published>
+ <entry>
+  <id>yt:video:aaaaaaaaaaa</id>
+  <yt:videoId>aaaaaaaaaaa</yt:videoId>
+  <title>Older video</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=aaaaaaaaaaa"/>
+  <published>2026-11-10T10:00:00+00:00</published>
+  <updated>2026-11-10T10:05:00+00:00</updated>
+  <media:group>
+   <media:title>Decoy: media title of the older video</media:title>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:bbbbbbbbbbb</id>
+  <yt:videoId>bbbbbbbbbbb</yt:videoId>
+  <title>Tom &amp; Jerry&#39;s &quot;big&quot; day &#x1F9F9; &lt;3</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/bbbbbbbbbbb"/>
+  <published>2026-11-21T18:18:14+00:00</published>
+  <updated>2026-11-21T18:47:22+00:00</updated>
+  <media:group>
+   <media:title>Decoy: media title of the newest video</media:title>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:ccccccccccc</id>
+  <yt:videoId>ccccccccccc</yt:videoId>
+  <title>Middle video</title>
+  <published>2026-11-15T12:00:00+00:00</published>
+ </entry>
+</feed>

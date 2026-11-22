@@ -1,0 +1,37 @@
+---
+import { site } from '../data/site';
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span>© {site.brand}</span>
+    <span>Made with pixels in a cozy corner</span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: absolute;
+    inset: auto 0 var(--s6);
+    color: var(--text-on-floor);
+    font-size: var(--fs-fine);
+    line-height: 1.25;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    width: min(1120px, calc(100% - var(--s12)));
+    margin-inline: auto;
+  }
+
+  @media (max-width: 767.98px) {
+    .footer-inner {
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      text-align: center;
+    }
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import Layout from '../components/Layout.astro';
+import Room from '../components/Room.astro';
+import Sprite from '../components/Sprite.astro';
+import { sprites } from '../sprites';
+---
+
+<Layout title="Page not found | BaaWasTaken" noindex>
+  <Room>
+    <main class="lost">
+      <div class="perch" aria-hidden="true">
+        <div class="cat"><Sprite sprite={sprites.catAwake} animate duration="3.4s" /></div>
+        <div class="plank"></div>
+        <div class="brackets">
+          <span class="bracket"></span>
+          <span class="bracket"></span>
+        </div>
+      </div>
+
+      <div class="note">
+        <h1 class="heading">Page not found</h1>
+        <p class="blurb">There's nothing at this address. The cat already checked.</p>
+        <a class="back" href="/">Back to the cozy corner</a>
+      </div>
+    </main>
+  </Room>
+</Layout>
+
+<style>
+  .lost {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s12);
+    margin-top: var(--s16);
+  }
+
+  .perch {
+    width: min(100%, calc(var(--px) * 100));
+  }
+
+  .cat {
+    display: flex;
+    justify-content: center;
+  }
+
+  .note {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s3);
+    width: min(100%, calc(var(--px) * 140));
+    padding: var(--s8) var(--s9);
+    background: var(--cream);
+    color: var(--text-dark);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--cream-hi),
+      inset calc(var(--s1) * -1) calc(var(--s2) * -1) 0 var(--cream-lo),
+      var(--shadow-1);
+    --focus: var(--text-dark);
+  }
+
+  .heading {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h2);
+    line-height: 1.1;
+  }
+
+  .blurb {
+    font-size: var(--fs-body);
+    line-height: 1.25;
+    color: var(--text-dark-softer);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: calc(var(--px) * 12);
+    margin-top: var(--s2);
+    padding: 0 var(--s5);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h4);
+    background: var(--jade);
+    color: var(--text-on-jade);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--jade-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--jade-lo),
+      var(--s1) var(--s1) 0 var(--text-dark);
+  }
+
+  .back:hover {
+    transform: translate(calc(var(--s1) * -1), calc(var(--s1) * -1));
+  }
+
+  @media (max-width: 767.98px) {
+    .lost {
+      margin-top: var(--s6);
+    }
+
+    .note {
+      padding: var(--s6) var(--s5);
+    }
+  }
+</style>

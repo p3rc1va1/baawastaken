@@ -1,0 +1,373 @@
+---
+import { formatPublished, thumbPath, watchUrl, type Video } from '../../worker/feed';
+import { site } from '../data/site';
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+
+interface Props {
+  /** The newest upload as of the last build, or null if it could not be read. The Worker refreshes it live. */
+  video: Video | null;
+}
+
+const { video } = Astro.props;
+const label = video ? `Play video: ${video.title}` : undefined;
+---
+
+<!--
+  data-lv markers are the contract with worker/index.ts, which fills them in when the page is served:
+  [data-lv=video] / [data-lv=fallback] are shown or hidden, the rest receive the video's details.
+-->
+<section class="tv-col" aria-labelledby="tv-heading">
+  <div class="tv-stage">
+    <div class="pets" aria-hidden="true">
+      <span class="succulent"><Sprite sprite={sprites.succulent} /></span>
+      <div class="cat">
+        <Sprite sprite={sprites.cat} animate duration="3.4s" />
+        <span class="z z-big">z</span>
+        <span class="z z-small">z</span>
+      </div>
+    </div>
+
+    <div class="tv">
+      <div class="screen" data-lv="player" data-video-id={video?.id ?? ''}>
+        <div class="video" data-lv="video" hidden={!video}>
+          <a class="video-link" data-lv="link" href={video ? watchUrl(video.id) : undefined} aria-label={label}>
+            <img
+              class="thumb"
+              data-lv="thumb"
+              src={video ? thumbPath(video.id) : undefined}
+              alt=""
+              width="320"
+              height="180"
+              decoding="async"
+            />
+            <span class="play"><Sprite sprite={sprites.play} /></span>
+          </a>
+        </div>
+        <div class="fallback" data-lv="fallback" hidden={!!video}>
+          <a class="fallback-link" href={site.youtubeChannelUrl} rel="noopener">Watch on YouTube</a>
+        </div>
+        <div class="crt" aria-hidden="true">
+          <span class="scan"></span>
+          <span class="glare"></span>
+        </div>
+      </div>
+      <div class="controls" aria-hidden="true">
+        <span class="bar"></span>
+        <span class="led"></span>
+        <span class="knob knob-wood"></span>
+        <span class="knob knob-jade"></span>
+      </div>
+    </div>
+    <div class="legs" aria-hidden="true">
+      <span class="leg"></span>
+      <span class="leg"></span>
+    </div>
+  </div>
+
+  <div class="plank" aria-hidden="true"></div>
+  <div class="brackets tv-brackets" aria-hidden="true">
+    <span class="bracket"></span>
+    <span class="bracket"></span>
+  </div>
+
+  <h2 id="tv-heading" class="tv-heading">Newest on the channel</h2>
+  <div class="caption" data-lv="video" hidden={!video}>
+    <p class="tv-title" data-lv="title">{video?.title}</p>
+    <p class="tv-date">
+      <time data-lv="date" datetime={video?.published}>{video ? formatPublished(video.published) : ''}</time>
+    </p>
+  </div>
+  <p class="tv-note" data-lv="fallback" hidden={!!video}>See what's new on the channel.</p>
+</section>
+
+<!-- Play on click: swaps the thumbnail for the player. Without JavaScript the link opens the video on YouTube. -->
+<script is:inline>
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest && e.target.closest('[data-lv="link"]');
+    var box = link && link.closest('[data-lv="player"]');
+    var id = box && box.getAttribute('data-video-id');
+    if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id) || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var title = document.querySelector('[data-lv="title"]');
+    var f = document.createElement('iframe');
+    f.className = 'embed';
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1';
+    f.title = title ? title.textContent : 'YouTube video';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    link.parentNode.replaceChild(f, link);
+    f.focus();
+  });
+</script>
+
+<style>
+  .tv-col {
+    padding-top: var(--s12);
+  }
+
+  .tv-stage {
+    position: relative;
+    padding: 0 var(--s4);
+  }
+
+  .pets {
+    position: absolute;
+    inset: 0 var(--s4) auto;
+    height: 0;
+  }
+
+  .succulent {
+    position: absolute;
+    left: var(--s10);
+    top: calc(var(--s8) * -1);
+  }
+
+  .cat {
+    position: absolute;
+    right: var(--s12);
+    top: calc(var(--s10) * -1);
+    width: calc(var(--px) * 18);
+    height: calc(var(--px) * 10);
+  }
+
+  .z {
+    position: absolute;
+    font-family: var(--font-display);
+    color: var(--mist);
+  }
+
+  .z-big {
+    left: calc(var(--s3) * -1);
+    top: calc(var(--s2) * -1);
+    font-size: var(--fs-small);
+  }
+
+  .z-small {
+    left: calc(var(--s1) * -1);
+    top: calc(var(--s5) * -1);
+    font-size: 12px;
+    animation-delay: 1.8s;
+  }
+
+  .tv {
+    padding: var(--s4) var(--s4) var(--s3);
+    background: var(--sand);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--sand-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--sand-lo),
+      var(--shadow-1);
+  }
+
+  .screen {
+    position: relative;
+    height: calc(var(--px) * 45);
+    overflow: hidden;
+    background: var(--slate-900);
+    border: var(--s1) solid var(--ink);
+  }
+
+  .video,
+  .video-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-link {
+    position: relative;
+    --focus: var(--cream);
+  }
+
+  .video-link:focus-visible {
+    outline-offset: calc(var(--s1) * -1);
+  }
+
+  .thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--slate-900);
+  }
+
+  .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: calc(var(--s6) * -1) 0 0 calc(var(--s6) * -1);
+    filter: drop-shadow(var(--s1) var(--s1) 0 var(--slate-900));
+  }
+
+  .video-link:hover .play,
+  .video-link:focus-visible .play {
+    margin-top: calc(var(--s6) * -1 - var(--s1));
+  }
+
+  .embed {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .fallback {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .fallback-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: calc(var(--px) * 12);
+    padding: 0 var(--s5);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h4);
+    color: var(--text-dark);
+    background: var(--cream);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--cream-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--cream-lo),
+      var(--s1) var(--s1) 0 var(--slate-700);
+    --focus: var(--cream);
+  }
+
+  /* Scanlines, a slow rolling band and a glint, like an old CRT. */
+  .crt {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent 0 var(--s1), var(--scanline) var(--s1) var(--s2));
+  }
+
+  .scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--s1);
+    background: var(--scan-roll);
+  }
+
+  .glare {
+    position: absolute;
+    left: var(--s2);
+    top: var(--s2);
+    width: var(--s4);
+    height: var(--s1);
+    background: var(--glare);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-top: var(--s3);
+  }
+
+  .bar {
+    flex: 1;
+    height: var(--s4);
+    background: repeating-linear-gradient(0deg, var(--sand-lo) 0 var(--s1), var(--sand) var(--s1) var(--s2));
+  }
+
+  .led {
+    width: var(--s2);
+    height: var(--s2);
+    background: var(--red);
+    box-shadow: 0 0 0 var(--s1) var(--led-glow);
+  }
+
+  .knob {
+    width: var(--s4);
+    height: var(--s4);
+    border: var(--s1) solid var(--ink);
+  }
+
+  .knob-wood {
+    background: var(--wood-lo);
+  }
+
+  .knob-jade {
+    background: var(--jade);
+  }
+
+  .legs {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 var(--s8);
+  }
+
+  .leg {
+    width: var(--s3);
+    height: var(--s2);
+    background: var(--ink);
+  }
+
+  .tv-brackets {
+    margin-bottom: var(--s6);
+  }
+
+  .tv-heading {
+    margin-bottom: var(--s2);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h3);
+    line-height: 1.25;
+    color: var(--white);
+  }
+
+  .tv-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    font-size: var(--fs-small);
+    line-height: 1.25;
+    color: var(--mist);
+  }
+
+  .tv-date,
+  .tv-note {
+    font-size: var(--fs-fine);
+    line-height: 1.25;
+    color: var(--mist-lo);
+  }
+
+  .tv-note {
+    font-size: var(--fs-small);
+    color: var(--mist);
+  }
+
+  /* Phone: the TV fills the width, and the pets move in a little so they stay on the set. */
+  @media (max-width: 767.98px) {
+    .tv-col {
+      padding-top: var(--s12);
+    }
+
+    .tv-stage {
+      padding: 0 var(--s2);
+    }
+
+    .pets {
+      inset: 0 var(--s2) auto;
+    }
+
+    .succulent {
+      left: var(--s6);
+    }
+
+    .cat {
+      right: var(--s8);
+    }
+  }
+</style>

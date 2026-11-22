@@ -1,0 +1,127 @@
+---
+import avatar from '../assets/avatar-32.png';
+import { site } from '../data/site';
+import Clock from './Clock.astro';
+---
+
+<header class="brand">
+  <div class="avatar-frame">
+    <img
+      class="pixel avatar"
+      src={avatar.src}
+      width={avatar.width * 4}
+      height={avatar.height * 4}
+      alt="Pixel-art avatar of BaaWasTaken: a smiling person with glasses, brown hair and a green sweater"
+    />
+  </div>
+  <div class="intro">
+    <h1 class="wordmark">{site.name}</h1>
+    <p class="tagline">{site.tagline}</p>
+  </div>
+  <div class="clock-slot">
+    <Clock />
+  </div>
+</header>
+
+<style>
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s10);
+  }
+
+  .avatar-frame {
+    flex: none;
+    padding: var(--s2);
+    background: var(--wood);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--wood-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--wood-lo),
+      var(--shadow-1);
+  }
+
+  .avatar {
+    width: calc(var(--px) * 32);
+    height: calc(var(--px) * 32);
+    border: var(--s1) solid var(--ink);
+    box-sizing: content-box;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    min-width: 0;
+  }
+
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    font-size: var(--fs-wordmark);
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--white);
+    text-shadow: var(--s2) var(--s2) 0 var(--slate-800);
+  }
+
+  .tagline {
+    max-width: 20em;
+    font-size: var(--fs-lead);
+    line-height: 1.25;
+    color: var(--cream);
+  }
+
+  /* The clock hangs on the wall at the top right of the stage. */
+  .clock-slot {
+    position: absolute;
+    top: var(--s30);
+    right: var(--s7);
+  }
+
+  /* Tablet and phone: the clock has no room beside the wordmark, so it is a desktop-only detail. */
+  @media (max-width: 1179.98px) {
+    .clock-slot {
+      display: none;
+    }
+
+    .wordmark {
+      font-size: var(--fs-wordmark-tablet);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .brand {
+      flex-direction: column;
+      gap: var(--s6);
+      text-align: center;
+    }
+
+    .intro {
+      align-items: center;
+    }
+
+    .wordmark {
+      font-size: var(--fs-wordmark-small);
+      text-shadow: var(--s1) var(--s1) 0 var(--slate-800);
+    }
+
+    .tagline {
+      max-width: 28ch;
+      font-size: var(--fs-body);
+    }
+  }
+
+  /* Narrow phones: step the wordmark down so it still fits on one line (the column is 272px at 320px wide). */
+  @media (max-width: 374.98px) {
+    .wordmark {
+      font-size: var(--fs-wordmark-xs);
+    }
+  }
+
+  @media (max-width: 359.98px) {
+    .wordmark {
+      font-size: var(--fs-wordmark-xxs);
+    }
+  }
+</style>

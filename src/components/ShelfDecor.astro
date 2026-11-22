@@ -1,0 +1,43 @@
+---
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+---
+
+<div class="decor" aria-hidden="true">
+  <Sprite sprite={sprites.plant} animate duration="3.2s" />
+  <div class="stack">
+    <div class="mug">
+      <Sprite class="steam" sprite={sprites.steam} />
+      <Sprite sprite={sprites.mug} />
+    </div>
+    <Sprite sprite={sprites.books} />
+  </div>
+</div>
+
+<style>
+  .decor {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--s3);
+    height: calc(var(--px) * 37);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mug {
+    position: relative;
+    width: calc(var(--px) * 11);
+    height: calc(var(--px) * 10);
+  }
+
+  .mug :global(.steam) {
+    position: absolute;
+    left: var(--s2);
+    top: calc(var(--s6) * -1);
+  }
+</style>

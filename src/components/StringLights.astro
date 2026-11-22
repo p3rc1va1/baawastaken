@@ -1,0 +1,56 @@
+---
+import { bulbColours } from '../sprites/lights';
+import { layoutLights } from '../lib/string-lights';
+
+interface Props {
+  /** Width of one swag in px (a multiple of 8). */
+  swagWidth: number;
+  /** Number of swags to draw, left to right. Extra width is clipped by the room. */
+  swags: number;
+  /** How deep each swag sags, in px. */
+  sag: number;
+  /** Distance between bulbs in px. */
+  spacing: number;
+}
+
+const opts = Astro.props;
+const { width, wire, bulbs } = layoutLights(opts);
+const height = 96;
+---
+
+<svg
+  class="lights"
+  width={width}
+  height={height}
+  viewBox={`0 0 ${width} ${height}`}
+  aria-hidden="true"
+  focusable="false"
+>
+  <g style="fill: var(--slate-900)">
+    {wire.map((s) => <rect x={s.x} y={s.y} width={s.w} height="4" />)}
+    {bulbs.map((b) => <rect x={b.x} y={b.y} width="8" height="4" />)}
+  </g>
+  {
+    bulbs.map((b) => {
+      const colour = bulbColours[b.colour];
+      const top = b.y + 4;
+      return (
+        <g class="bulb" style={`animation-delay: ${b.delay}s`}>
+          <rect x={b.x - 12} y={top - 12} width="32" height="36" fill={colour} fill-opacity="0.08" />
+          <rect x={b.x - 4} y={top - 4} width="16" height="20" fill={colour} fill-opacity="0.28" />
+          <rect x={b.x} y={top} width="8" height="12" fill={colour} />
+        </g>
+      );
+    })
+  }
+</svg>
+
+<style>
+  .lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+</style>

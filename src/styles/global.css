@@ -1,0 +1,6 @@
+/* Self-hosted fonts, Latin subset only. */
+@import '@fontsource/jersey-20/latin-400.css';
+
+@import './tokens.css';
+@import './base.css';
+@import './motion.css';

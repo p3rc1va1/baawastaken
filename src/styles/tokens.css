@@ -1,0 +1,116 @@
+/* Design tokens. The only place raw colours may live in CSS (sprites keep their own palettes in src/sprites). */
+:root {
+  /* One art pixel = 4 CSS px. Every border, offset, padding step and sprite size is a multiple of this. */
+  --px: 4px;
+
+  /* Spacing steps (multiples of --px) */
+  --s1: calc(var(--px) * 1);
+  --s2: calc(var(--px) * 2);
+  --s3: calc(var(--px) * 3);
+  --s4: calc(var(--px) * 4);
+  --s5: calc(var(--px) * 5);
+  --s6: calc(var(--px) * 6);
+  --s7: calc(var(--px) * 7);
+  --s8: calc(var(--px) * 8);
+  --s9: calc(var(--px) * 9);
+  --s10: calc(var(--px) * 10);
+  --s12: calc(var(--px) * 12);
+  --s16: calc(var(--px) * 16);
+  --s20: calc(var(--px) * 20);
+  --s24: calc(var(--px) * 24);
+  --s30: calc(var(--px) * 30);
+
+  /* Room: slate walls, from the YouTube avatar background */
+  --slate-900: #1c2321;
+  --slate-800: #222a27;
+  --slate-700: #2a3330;
+  --slate-600: #323d39;
+  --wall-dot: #38453f;
+  --wall-dot-alt: #36433d;
+
+  /* Cream (tiles, contact card) */
+  --cream: #f9eebf;
+  --cream-hi: #fff8dc;
+  --cream-lo: #e6d39b;
+
+  /* Sand (TV casing) */
+  --sand: #e6d9a4;
+  --sand-hi: #f3e9be;
+  --sand-lo: #c9bb86;
+
+  /* Peach (skin tone of the avatar; Instagram/TikTok tiles accent, curtains) */
+  --peach: #eec399;
+  --peach-hi: #f9ddba;
+  --peach-lo: #d9a877;
+
+  /* Jade (the avatar's sweater; support/Ko-fi, buttons) */
+  --jade: #3a9470;
+  --jade-hi: #5db88e;
+  --jade-lo: #2b6e53;
+
+  /* Wood (shelves, frames) */
+  --wood-hi: #a8714c;
+  --wood: #8b5a3c;
+  --wood-lo: #6b3a2e;
+
+  /* Night glass behind the window sky */
+  --night-glass: #1f2b33;
+
+  /* Floor */
+  --floor: #4a2c24;
+  --floor-line: #3a221c;
+
+  /* Ink and text */
+  --ink: #000000;
+  --text-dark: #1e1a17;
+  --text-dark-soft: #4a3b33;
+  --text-dark-softer: #3a2e28;
+  --text-on-jade: #0e1f18;
+  --white: #ffffff;
+  --mist: #cfd8d2;
+  --mist-lo: #9fb3a8;
+  --text-on-floor: #eadbc8;
+
+  /* Accents */
+  --red: #e0464f;
+  --red-hi: #f7a3a3;
+  --red-lo: #a82e36;
+
+  /* TV overlays (translucent, so they carry no hex) */
+  --scanline: rgba(0, 0, 0, 0.16);
+  --scan-roll: rgba(249, 238, 191, 0.1);
+  --glare: rgba(255, 255, 255, 0.22);
+  --led-glow: rgba(224, 70, 79, 0.25);
+
+  /* Type */
+  /* One typeface for the whole page: Jersey 20, a crisp pixel face with clear lowercase and an unmistakable @.
+     It has a single weight, so hierarchy comes from size and colour (never faux bold, which smudges pixels). */
+  --font: 'Jersey 20', ui-monospace, 'Courier New', monospace;
+  --font-wordmark: var(--font);
+  --font-address: var(--font);
+  --font-display: var(--font);
+  --font-body: var(--font);
+
+  /* Type scale. The wordmark steps down so "BaaWasTaken" always fits on one line. */
+  --fs-wordmark: 112px;
+  --fs-wordmark-tablet: 88px;
+  --fs-wordmark-small: 60px;
+  --fs-wordmark-xs: 56px;
+  --fs-wordmark-xxs: 52px;
+  --fs-h2: 44px;
+  --fs-h3: 32px;
+  --fs-h4: 26px;
+  --fs-lead: 28px;
+  --fs-body: 22px;
+  --fs-small: 20px;
+  --fs-fine: 18px;
+  --fs-tiny: 16px;
+  --fs-micro: 14px;
+  --fs-address: 24px;
+  --fs-address-small: 20px;
+  --fs-address-xs: 18px;
+
+  /* Elevation: hard pixel shadows, light from the top-left */
+  --shadow-1: 8px 8px 0 var(--slate-900);
+  --shadow-2: 12px 12px 0 var(--slate-900);
+}

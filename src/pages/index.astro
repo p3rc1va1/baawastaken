@@ -1,0 +1,115 @@
+---
+import Layout from '../components/Layout.astro';
+import Room from '../components/Room.astro';
+import Header from '../components/Header.astro';
+import Shelf from '../components/Shelf.astro';
+import ShelfDecor from '../components/ShelfDecor.astro';
+import LatestVideoTV from '../components/LatestVideoTV.astro';
+import ContactCard from '../components/ContactCard.astro';
+import NightWindow from '../components/NightWindow.astro';
+import Motes from '../components/Motes.astro';
+import { getLatestVideo } from '../lib/latest-video';
+import { shelfOne, shelfTwo } from '../data/socials';
+
+const video = await getLatestVideo();
+---
+
+<Layout>
+  <Room>
+    <Header />
+    <main class="content">
+      <div class="shelves">
+        <Shelf label="Watch, follow and support" socials={shelfOne} />
+        <Shelf label="Live streams and community" socials={shelfTwo}>
+          <ShelfDecor slot="decor" />
+        </Shelf>
+      </div>
+      <div class="tv-cell"><LatestVideoTV video={video} /></div>
+      <div class="contact-cell"><ContactCard /></div>
+      <div class="window-cell"><NightWindow /></div>
+    </main>
+    <Motes />
+  </Room>
+</Layout>
+
+<style>
+  /* Desktop: shelves and TV side by side, contact card and window below. */
+  .content {
+    display: grid;
+    grid-template-columns: calc(var(--px) * 176) calc(var(--px) * 86);
+    grid-template-areas:
+      'shelves tv'
+      'contact window';
+    column-gap: calc(var(--px) * 18);
+    row-gap: calc(var(--px) * 5);
+    margin-top: calc(var(--px) * 20);
+    align-items: start;
+  }
+
+  .shelves {
+    grid-area: shelves;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s12);
+  }
+
+  .tv-cell {
+    grid-area: tv;
+  }
+
+  .contact-cell {
+    grid-area: contact;
+    padding: 0 var(--s4);
+  }
+
+  .window-cell {
+    grid-area: window;
+    padding-left: var(--s4);
+  }
+
+  /* Tablet: one centred column. TV and window side by side, contact card full width beneath. */
+  @media (max-width: 1179.98px) {
+    .content {
+      grid-template-columns: calc(var(--px) * 86) minmax(0, 1fr);
+      grid-template-areas:
+        'shelves shelves'
+        'tv window'
+        'contact contact';
+      column-gap: var(--s6);
+      row-gap: var(--s10);
+    }
+
+    .window-cell {
+      align-self: center;
+      justify-self: center;
+      padding-left: 0;
+    }
+  }
+
+  /* Phone: a single column, no window. */
+  @media (max-width: 767.98px) {
+    .content {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'shelves'
+        'tv'
+        'contact';
+      margin-top: var(--s10);
+    }
+
+    .shelves {
+      gap: var(--s10);
+    }
+
+    .window-cell {
+      display: none;
+    }
+
+    .contact-cell {
+      padding: 0;
+    }
+  }
+
+
+
+</style>

@@ -1,0 +1,80 @@
+---
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+---
+
+<div class="floor" aria-hidden="true">
+  <div class="planks"></div>
+  <div class="floor-stage">
+    <div class="rug"></div>
+    <span class="controller"><Sprite sprite={sprites.controller} /></span>
+  </div>
+</div>
+
+<style>
+  .floor {
+    position: relative;
+    height: calc(var(--px) * 40);
+    background: var(--floor);
+    border-top: var(--s1) solid var(--ink);
+    box-shadow:
+      inset 0 var(--s4) 0 var(--wood-lo),
+      inset 0 var(--s5) 0 var(--ink);
+  }
+
+  /* Floorboard seams */
+  .planks {
+    position: absolute;
+    inset: var(--s5) 0 0;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 calc(var(--px) * 39), var(--floor-line) calc(var(--px) * 39) calc(var(--px) * 40)),
+      repeating-linear-gradient(0deg, transparent 0 calc(var(--px) * 11), var(--floor-line) calc(var(--px) * 11) calc(var(--px) * 12));
+  }
+
+  /* Same width and centring as the page content, so the rug sits under it at any screen size. */
+  .floor-stage {
+    position: relative;
+    width: min(1120px, calc(100% - var(--s12)));
+    height: 100%;
+    margin-inline: auto;
+  }
+
+  .rug {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--px) * 11);
+    width: min(calc(var(--px) * 130), 100%);
+    height: calc(var(--px) * 11);
+    transform: translateX(-50%);
+    border: var(--s1) solid var(--ink);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--jade) 0 calc(var(--px) * 6),
+      var(--cream) calc(var(--px) * 6) calc(var(--px) * 8),
+      var(--peach) calc(var(--px) * 8) calc(var(--px) * 14),
+      var(--cream) calc(var(--px) * 14) calc(var(--px) * 16)
+    );
+  }
+
+  .controller {
+    position: absolute;
+    left: calc(50% + var(--px) * 15);
+    top: calc(var(--px) * 13);
+  }
+
+  /* Phone: a shorter floor, with the rug and controller brought up to match. */
+  @media (max-width: 767.98px) {
+    .floor {
+      height: calc(var(--px) * 38);
+    }
+
+    .rug {
+      top: calc(var(--px) * 9);
+      height: calc(var(--px) * 9);
+    }
+
+    .controller {
+      top: calc(var(--px) * 10);
+    }
+  }
+</style>

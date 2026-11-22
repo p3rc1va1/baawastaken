@@ -1,0 +1,86 @@
+---
+import Wallpaper from './Wallpaper.astro';
+import StringLights from './StringLights.astro';
+import Floor from './Floor.astro';
+import Footer from './Footer.astro';
+---
+
+<!-- The cozy room every page sits in: patterned wall, string lights, a floor with a rug, and the footer. -->
+<div class="room">
+  <Wallpaper />
+  <div class="lights-wrap" aria-hidden="true">
+    <div class="lights-wide">
+      <StringLights swagWidth={640} swags={4} sag={36} spacing={64} />
+    </div>
+    <div class="lights-narrow">
+      <StringLights swagWidth={192} swags={4} sag={24} spacing={64} />
+    </div>
+  </div>
+
+  <div class="stage">
+    <slot />
+  </div>
+
+  <div class="base">
+    <Floor />
+    <Footer />
+  </div>
+</div>
+
+<style>
+  /* The room fills the window: wall above, floor at the bottom. */
+  .room {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: clip;
+  }
+
+  .stage {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    width: min(1120px, calc(100% - var(--s12)));
+    margin-inline: auto;
+    padding-top: var(--s30);
+    padding-bottom: var(--s10);
+  }
+
+  .base {
+    position: relative;
+    z-index: 2;
+  }
+
+  .lights-wrap {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 96px;
+    overflow: hidden;
+  }
+
+  .lights-narrow {
+    display: none;
+  }
+
+  @media (max-width: 1179.98px) {
+    .stage {
+      width: min(calc(var(--px) * 176), calc(100% - var(--s12)));
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .stage {
+      width: calc(100% - var(--s12));
+      padding-top: var(--s24);
+    }
+
+    .lights-wide {
+      display: none;
+    }
+
+    .lights-narrow {
+      display: block;
+    }
+  }
+</style>

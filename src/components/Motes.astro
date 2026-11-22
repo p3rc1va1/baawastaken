@@ -1,0 +1,35 @@
+---
+// Dust floating in the lamplight. Positions are in px from the stage's top-left; desktop only.
+const motes = [
+  { x: 932, y: 760, delay: '0s' },
+  { x: 988, y: 736, delay: '2.3s' },
+  { x: 852, y: 772, delay: '4.6s' },
+  { x: 672, y: 316, delay: '1.1s' },
+  { x: 1036, y: 300, delay: '3.7s' },
+];
+---
+
+<div class="motes" aria-hidden="true">
+  {motes.map((m) => <span class="mote" style={`left: ${m.x}px; top: ${m.y}px; animation-delay: ${m.delay}`}></span>)}
+</div>
+
+<style>
+  .motes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .mote {
+    position: absolute;
+    width: var(--s1);
+    height: var(--s1);
+    background: var(--cream);
+  }
+
+  @media (max-width: 1179.98px) {
+    .motes {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+import type { Social } from '../data/socials';
+import LinkTile from './LinkTile.astro';
+
+interface Props {
+  /** Accessible name for this group of links. */
+  label: string;
+  socials: readonly Social[];
+}
+
+const { label, socials } = Astro.props;
+const hasDecor = Astro.slots.has('decor');
+---
+
+<section class="shelf" aria-label={label}>
+  <div class="row">
+    <ul class="tiles" role="list">
+      {
+        socials.map((social, i) => (
+          <>
+            <li>
+              <LinkTile social={social} />
+            </li>
+            {/* On phones the tiles wrap to two per row, and each row gets its own plank. */}
+            {i === 1 && socials.length > 2 && (
+              <li class="row-break" role="presentation" aria-hidden="true">
+                <div class="plank" />
+                <div class="brackets">
+                  <span class="bracket" />
+                  <span class="bracket" />
+                </div>
+              </li>
+            )}
+          </>
+        ))
+      }
+    </ul>
+    {hasDecor && <div class="decor-cell"><slot name="decor" /></div>}
+  </div>
+  <div class="plank" aria-hidden="true"></div>
+  <div class="brackets" aria-hidden="true">
+    <span class="bracket"></span>
+    <span class="bracket"></span>
+  </div>
+</section>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: repeat(4, calc(var(--px) * 38));
+    gap: var(--s4);
+    padding: 0 var(--s4);
+    align-items: end;
+  }
+
+  .tiles {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tiles li {
+    display: block;
+  }
+
+  /* Same specificity as `.tiles li`, so these win by coming after it. */
+  .tiles .row-break {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--s3);
+      padding: 0 var(--s1);
+    }
+
+    .tiles .row-break {
+      display: block;
+      grid-column: 1 / -1;
+      margin: 0 calc(var(--s1) * -1) var(--s8);
+    }
+
+    .tiles .row-break .brackets {
+      padding: 0 var(--s6);
+    }
+  }
+
+  /* Very narrow phones: a smaller gap gives each tile a few more pixels for its text. */
+  @media (max-width: 359.98px) {
+    .row {
+      column-gap: var(--s2);
+    }
+  }
+</style>

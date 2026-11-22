@@ -1,0 +1,166 @@
+---
+// Rendered only to be screenshotted into public/og.png (`npm run og`). Fixed 1200×630, not linked from the site.
+import avatar from '../assets/avatar-32.png';
+import Layout from '../components/Layout.astro';
+import LinkTile from '../components/LinkTile.astro';
+import Sprite from '../components/Sprite.astro';
+import StringLights from '../components/StringLights.astro';
+import Wallpaper from '../components/Wallpaper.astro';
+import { site } from '../data/site';
+import { socials } from '../data/socials';
+import { sprites } from '../sprites';
+---
+
+<Layout title={site.title} noindex>
+  <div class="og">
+    <Wallpaper />
+    <div class="lights" aria-hidden="true">
+      <StringLights swagWidth={640} swags={2} sag={36} spacing={64} />
+    </div>
+
+    <header class="brand">
+      <div class="avatar-frame">
+        <img class="pixel avatar" src={avatar.src} width="128" height="128" alt="" />
+      </div>
+      <div class="intro">
+        <p class="wordmark">{site.name}</p>
+        <p class="tagline">Cozy pixel art, tech and games</p>
+      </div>
+    </header>
+
+    <div class="perch" aria-hidden="true">
+      <div class="cat"><Sprite sprite={sprites.cat} /></div>
+      <div class="plank"></div>
+    </div>
+
+    <ul class="tiles">
+      {socials.map((social) => <li><LinkTile social={social} /></li>)}
+    </ul>
+    <div class="shelf-plank plank" aria-hidden="true"></div>
+    <div class="shelf-brackets brackets" aria-hidden="true">
+      <span class="bracket"></span>
+      <span class="bracket"></span>
+    </div>
+
+    <p class="url">baawastaken.com</p>
+  </div>
+</Layout>
+
+<style is:global>
+  html,
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .og {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+  }
+
+  .lights {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 96px;
+    overflow: hidden;
+  }
+
+  .brand {
+    position: absolute;
+    left: 64px;
+    top: 104px;
+    display: flex;
+    align-items: center;
+    gap: var(--s8);
+  }
+
+  .avatar-frame {
+    padding: var(--s2);
+    background: var(--wood);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--wood-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--wood-lo),
+      var(--shadow-1);
+  }
+
+  .avatar {
+    width: calc(var(--px) * 32);
+    height: calc(var(--px) * 32);
+    border: var(--s1) solid var(--ink);
+    box-sizing: content-box;
+  }
+
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    font-size: var(--fs-wordmark);
+    line-height: 1;
+    color: var(--white);
+    text-shadow: var(--s2) var(--s2) 0 var(--slate-800);
+  }
+
+  .tagline {
+    margin-top: var(--s3);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h3);
+    color: var(--cream);
+  }
+
+  .perch {
+    position: absolute;
+    right: 56px;
+    top: 196px;
+    width: calc(var(--px) * 56);
+  }
+
+  .cat {
+    display: flex;
+    justify-content: center;
+  }
+
+  .tiles {
+    position: absolute;
+    left: 32px;
+    top: 318px;
+    display: grid;
+    grid-template-columns: repeat(7, calc(var(--px) * 38));
+    gap: var(--s3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .shelf-plank {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 466px;
+  }
+
+  .shelf-brackets {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 490px;
+  }
+
+  .url {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 36px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h2);
+    color: var(--white);
+    text-shadow: var(--s1) var(--s1) 0 var(--slate-800);
+  }
+</style>

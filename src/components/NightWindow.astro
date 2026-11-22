@@ -1,0 +1,129 @@
+---
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+
+// Twinkling stars, in sky art pixels (the sky is 56×42). Delays are staggered so they never blink together.
+const stars = [
+  { x: 6, y: 5, delay: '0s' },
+  { x: 48, y: 20, delay: '1.7s' },
+  { x: 26, y: 3, delay: '2.9s' },
+];
+---
+
+<div class="window" aria-hidden="true">
+  <div class="frame">
+    <div class="glass">
+      <Sprite sprite={sprites.windowSky} />
+      {stars.map((s) => <span class="star" style={`left: ${s.x * 4}px; top: ${s.y * 4}px; animation-delay: ${s.delay}`}></span>)}
+      <span class="cloud-slot"><Sprite class="cloud" sprite={sprites.cloud} /></span>
+      <span class="shoot-slot"><Sprite class="shoot" sprite={sprites.shootingStar} /></span>
+      <span class="mullion mullion-v"></span>
+      <span class="mullion mullion-h"></span>
+    </div>
+    <span class="curtain curtain-l"></span>
+    <span class="curtain curtain-r"></span>
+  </div>
+  <div class="sill"></div>
+</div>
+
+<style>
+  .window {
+    width: calc(var(--px) * 66);
+  }
+
+  .frame {
+    position: relative;
+    padding: var(--s3);
+    background: var(--wood);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--wood-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--wood-lo),
+      var(--shadow-1);
+  }
+
+  .glass {
+    position: relative;
+    height: calc(var(--px) * 44);
+    overflow: hidden;
+    background: var(--night-glass);
+    border: var(--s1) solid var(--wood-lo);
+  }
+
+  .glass > :global(.sprite) {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .star {
+    position: absolute;
+    width: var(--s1);
+    height: var(--s1);
+    background: var(--cream);
+  }
+
+  .cloud-slot {
+    position: absolute;
+    left: 0;
+    top: calc(var(--px) * 14);
+  }
+
+  .shoot-slot {
+    position: absolute;
+    left: calc(var(--px) * 42);
+    top: var(--s4);
+  }
+
+  .mullion {
+    position: absolute;
+    background: var(--wood);
+  }
+
+  .mullion-v {
+    left: 50%;
+    top: 0;
+    width: var(--s2);
+    height: 100%;
+    margin-left: calc(var(--s1) * -1);
+  }
+
+  .mullion-h {
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: var(--s2);
+    margin-top: calc(var(--s1) * -1);
+  }
+
+  .curtain {
+    position: absolute;
+    top: calc(var(--s2) * -1);
+    width: var(--s7);
+    height: calc(var(--px) * 48);
+    background: var(--peach);
+    border: var(--s1) solid var(--ink);
+  }
+
+  .curtain-l {
+    left: calc(var(--s4) * -1);
+    box-shadow:
+      inset var(--s1) 0 0 var(--peach-hi),
+      inset calc(var(--s2) * -1) 0 0 var(--peach-lo);
+  }
+
+  .curtain-r {
+    right: calc(var(--s4) * -1);
+    box-shadow:
+      inset var(--s1) 0 0 var(--peach-hi),
+      inset calc(var(--s2) * -1) 0 0 var(--peach-lo);
+  }
+
+  .sill {
+    height: var(--s5);
+    margin: 0 calc(var(--s4) * -1);
+    background: var(--wood-hi);
+    border: var(--s1) solid var(--ink);
+    box-shadow: inset 0 calc(var(--s1) * -1) 0 var(--wood);
+  }
+</style>

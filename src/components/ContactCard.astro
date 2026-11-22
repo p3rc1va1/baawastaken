@@ -1,0 +1,245 @@
+---
+import { site } from '../data/site';
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+
+// Fans first, because this card is a "Say hi". Each address has a mailto link and a copy button.
+const contacts = [
+  {
+    id: 'fans',
+    heading: 'Just saying hi?',
+    blurb: "Fan mail, questions, clip ideas, or a favourite moment. I'd love to hear it.",
+    email: site.emails.fans,
+  },
+  {
+    id: 'business',
+    heading: 'Business inquiries',
+    blurb: 'Sponsorships, collabs and press requests.',
+    email: site.emails.business,
+  },
+];
+---
+
+<section class="contact" aria-labelledby="say-hi">
+  <div class="card">
+    <span class="pin" aria-hidden="true"><Sprite sprite={sprites.pushpin} /></span>
+    <span class="envelope" aria-hidden="true"><Sprite sprite={sprites.envelope} /></span>
+
+    <div class="body">
+      <h2 id="say-hi" class="heading">Say hi</h2>
+
+      {
+        contacts.map((c) => (
+          <div class="group" data-contact={c.id}>
+            <h3 class="group-heading">{c.heading}</h3>
+            <p class="blurb">{c.blurb}</p>
+            <div class="actions">
+              <a class="btn mail" href={`mailto:${c.email}`}>{c.email}</a>
+              {/* Shown by the script below, and only if this browser can copy to the clipboard. */}
+              <button class="btn copy" type="button" data-copy={c.email} hidden>
+                <span data-label>Copy email</span>
+                <span class="sr-only"> ({c.email})</span>
+              </button>
+            </div>
+          </div>
+        ))
+      }
+      <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+    </div>
+
+    <span class="stamp" aria-hidden="true"><Sprite sprite={sprites.stampHeart} /></span>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var buttons = document.querySelectorAll('[data-copy]');
+    var status = document.querySelector('[data-copy-status]');
+    if (!buttons.length || !navigator.clipboard || !navigator.clipboard.writeText) return;
+    Array.prototype.forEach.call(buttons, function (button) {
+      var label = button.querySelector('[data-label]');
+      var original = label.textContent;
+      var timer;
+      button.hidden = false;
+      button.addEventListener('click', function () {
+        navigator.clipboard.writeText(button.getAttribute('data-copy')).then(
+          function () {
+            label.textContent = 'Copied';
+            status.textContent = button.getAttribute('data-copy') + ' copied to the clipboard';
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+              label.textContent = original;
+              status.textContent = '';
+            }, 3000);
+          },
+          function () {
+            button.hidden = true;
+          },
+        );
+      });
+    });
+  })();
+</script>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s7);
+    padding: var(--s8) var(--s9) var(--s8);
+    background: var(--cream);
+    color: var(--text-dark);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--cream-hi),
+      inset calc(var(--s1) * -1) calc(var(--s2) * -1) 0 var(--cream-lo),
+      var(--shadow-1);
+    --focus: var(--text-dark);
+  }
+
+  .pin {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--s4) * -1);
+    margin-left: calc(var(--s5) * -0.5);
+  }
+
+  .envelope {
+    flex: none;
+    margin-top: var(--s1);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s5);
+    min-width: 0;
+  }
+
+  .heading {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h2);
+    line-height: 1;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+  }
+
+  .group-heading {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+  }
+
+  .blurb {
+    max-width: 42ch;
+    font-size: var(--fs-small);
+    line-height: 1.25;
+    color: var(--text-dark-softer);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4);
+    margin-top: var(--s1);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: calc(var(--px) * 12);
+    padding: 0 var(--s5);
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    cursor: pointer;
+    border: var(--s1) solid var(--ink);
+  }
+
+  .mail {
+    font-family: var(--font-address);
+    font-size: var(--fs-address);
+    font-weight: 400;
+    background: var(--jade);
+    color: var(--text-on-jade);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--jade-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--jade-lo),
+      var(--s1) var(--s1) 0 var(--text-dark);
+  }
+
+  .copy {
+    background: var(--cream);
+    color: var(--text-dark);
+    box-shadow:
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--cream-lo),
+      var(--s1) var(--s1) 0 var(--text-dark);
+  }
+
+  .btn:hover {
+    transform: translate(calc(var(--s1) * -1), calc(var(--s1) * -1));
+  }
+
+  .stamp {
+    position: absolute;
+    right: var(--s6);
+    top: var(--s6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--s12);
+    height: calc(var(--px) * 14);
+    background: var(--peach);
+    border: var(--s1) dashed var(--wood-lo);
+  }
+
+  /* Phone: the envelope sits above the words, and the buttons stack if they have to. */
+  @media (max-width: 767.98px) {
+    .card {
+      flex-direction: column;
+      gap: var(--s4);
+      padding: var(--s6) var(--s5);
+    }
+
+    .stamp {
+      top: var(--s5);
+      right: var(--s5);
+    }
+
+    .blurb {
+      max-width: none;
+    }
+
+    .btn {
+      padding: 0 var(--s3);
+    }
+
+    .mail {
+      max-width: 100%;
+      font-size: var(--fs-address-small);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  /* The longest address has to fit on one line even in a 272px column. */
+  @media (max-width: 359.98px) {
+    .card {
+      padding: var(--s6) var(--s4);
+    }
+
+    .btn {
+      padding: 0 var(--s2);
+    }
+
+    .mail {
+      font-size: var(--fs-address-xs);
+    }
+  }
+</style>

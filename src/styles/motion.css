@@ -1,0 +1,236 @@
+/*
+ * All ambient motion lives here, so the reduced-motion rule at the bottom covers everything.
+ * Every animation uses steps() so it moves in whole art pixels, like animation frames.
+ * Only transform and opacity are animated.
+ */
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes steam {
+  0% {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes zz {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(16px, -32px);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0;
+  }
+}
+
+@keyframes frameA {
+  0%,
+  49.9% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes frameB {
+  0%,
+  49.9% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-48px);
+  }
+  to {
+    transform: translateX(240px);
+  }
+}
+
+@keyframes shoot {
+  0%,
+  88% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-64px, 32px);
+  }
+}
+
+@keyframes roll {
+  from {
+    transform: translateY(-8px);
+  }
+  to {
+    transform: translateY(176px);
+  }
+}
+
+@keyframes led {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  61%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes mote {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(8px, -56px);
+    opacity: 0;
+  }
+}
+
+@keyframes hop {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Two-frame sprites: .fa shows first, .fb second. At rest (no animation) only the first frame is visible. */
+.fa {
+  opacity: 1;
+}
+
+.fb {
+  opacity: 0;
+}
+
+.fa.run {
+  animation: frameA 2s steps(1) infinite;
+}
+
+.fb.run {
+  animation: frameB 2s steps(1) infinite;
+}
+
+.bulb {
+  animation: twinkle 2.8s steps(2) infinite;
+}
+
+.steam {
+  animation: steam 2.8s steps(6) infinite;
+}
+
+.z {
+  animation: zz 3.6s steps(8) infinite;
+}
+
+.star {
+  animation: blink 4s steps(1) infinite;
+}
+
+.cloud {
+  animation: drift 48s steps(72) infinite;
+}
+
+.shoot {
+  animation: shoot 11s steps(24) infinite;
+}
+
+.scan {
+  animation: roll 7s steps(46) infinite;
+}
+
+.led {
+  animation: led 2.4s steps(1) infinite;
+}
+
+.mote {
+  animation: mote 7s steps(14) infinite;
+}
+
+/* Hover feedback on link tiles (a response to the visitor's own action). */
+.tile .card {
+  transition:
+    transform 0.12s steps(2),
+    box-shadow 0.12s steps(2);
+}
+
+.tile:hover .logo,
+.tile:focus-visible .logo {
+  animation: hop 0.5s steps(2) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .fa {
+    opacity: 1;
+  }
+
+  .fb {
+    opacity: 0;
+  }
+
+  .steam,
+  .z,
+  .shoot,
+  .scan,
+  .mote {
+    display: none;
+  }
+}

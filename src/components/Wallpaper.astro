@@ -1,0 +1,24 @@
+---
+// Subtle patterned wall. Pattern colours come from CSS tokens (a 48px tile = 12 art pixels).
+---
+<svg class="wallpaper" aria-hidden="true" width="100%" height="100%" focusable="false">
+  <defs>
+    <pattern id="wallpaper-tile" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="4" height="4" style="fill: var(--wall-dot)" />
+      <rect x="24" y="20" width="4" height="4" style="fill: var(--wall-dot)" />
+      <rect x="20" y="24" width="4" height="4" style="fill: var(--wall-dot-alt)" />
+      <rect x="28" y="24" width="4" height="4" style="fill: var(--wall-dot-alt)" />
+      <rect x="24" y="28" width="4" height="4" style="fill: var(--wall-dot)" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#wallpaper-tile)" />
+</svg>
+
+<style>
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>

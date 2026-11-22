@@ -1,0 +1,108 @@
+---
+import type { Social } from '../data/socials';
+import { sprites } from '../sprites';
+import Sprite from './Sprite.astro';
+
+interface Props {
+  social: Social;
+}
+
+const { social } = Astro.props;
+---
+
+<a class="tile" href={social.url} rel="noopener">
+  <span class:list={['card', { support: social.support }]}>
+    <Sprite class="logo" sprite={sprites[social.sprite]} />
+    <span class="name">{social.name}</span>
+    <span class="sub">{social.description}</span>
+  </span>
+</a>
+
+<style>
+  .tile {
+    display: block;
+    --focus: var(--cream);
+  }
+
+  .tile:focus-visible {
+    outline-offset: var(--s2);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    height: calc(var(--px) * 37);
+    padding: var(--s4) var(--s3);
+    background: var(--cream);
+    color: var(--text-dark);
+    border: var(--s1) solid var(--ink);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--cream-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--cream-lo),
+      var(--shadow-1);
+  }
+
+  .card.support {
+    background: var(--jade);
+    color: var(--text-on-jade);
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--jade-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--jade-lo),
+      var(--shadow-1);
+  }
+
+  .tile:hover .card {
+    transform: translate(calc(var(--s1) * -1), calc(var(--s1) * -1));
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--cream-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--cream-lo),
+      var(--shadow-2);
+  }
+
+  .tile:hover .card.support {
+    box-shadow:
+      inset var(--s1) var(--s1) 0 var(--jade-hi),
+      inset calc(var(--s1) * -1) calc(var(--s1) * -1) 0 var(--jade-lo),
+      var(--shadow-2);
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-h4);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .sub {
+    font-size: var(--fs-fine);
+    line-height: 1.2;
+    color: var(--text-dark-soft);
+  }
+
+  .support .sub {
+    color: var(--text-on-jade);
+  }
+
+  @media (max-width: 767.98px) {
+    .card {
+      padding: var(--s3);
+    }
+  }
+
+  /* Very narrow phones: step the text down one size so the longest names still fit. */
+  @media (max-width: 359.98px) {
+    .card {
+      padding: var(--s2);
+    }
+
+    .name {
+      font-size: var(--fs-small);
+    }
+
+    .sub {
+      font-size: var(--fs-micro);
+    }
+  }
+</style>
