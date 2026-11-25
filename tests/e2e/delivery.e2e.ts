@@ -31,6 +31,21 @@ test('icons are cached for a day', async ({ request }) => {
   }
 });
 
+test('the stored video thumbnail is a static file cached for an hour', async ({ page, request }) => {
+  await page.goto('/');
+  const src = await page.locator('.thumb').first().getAttribute('src');
+  test.skip(!src, 'the snapshot names no video');
+  expect(src).toMatch(/^\/yt\/[\w-]{11}\.jpg$/);
+  const res = await request.get(src!);
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toBe('image/jpeg');
+  expect(res.headers()['cache-control']).toBe('public, max-age=3600');
+});
+
+test('the old thumbnail proxy path is gone', async ({ request }) => {
+  expect((await request.get('/yt-thumb/aaaaaaaaaaa')).status()).toBe(404);
+});
+
 test('robots.txt allows crawling', async ({ request }) => {
   const res = await request.get('/robots.txt');
   expect(res.status()).toBe(200);

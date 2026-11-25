@@ -109,7 +109,7 @@ for (const width of [320, 360, 375, 414, 767]) {
       await expect(page.getByRole('heading', { name: 'Say hi' })).toBeVisible();
       await expect(page.getByRole('link', { name: 'hello@baawastaken.com' })).toBeVisible();
       await expect(page.getByRole('link', { name: 'business@baawastaken.com' })).toBeVisible();
-      await expect(page.locator('[data-lv="link"], .fallback-link').first()).toBeVisible();
+      await expect(page.locator('.video-link, .fallback-link').first()).toBeVisible();
     });
 
     test('everything stacks in one column: shelves, then TV, then contact', async ({ page }) => {

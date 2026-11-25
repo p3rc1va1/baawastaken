@@ -1,11 +1,11 @@
 ---
-import { formatPublished, thumbPath, watchUrl, type Video } from '../../worker/feed';
+import { formatPublished, thumbPath, watchUrl, type Video } from '../lib/youtube/feed.ts';
 import { site } from '../data/site';
 import { sprites } from '../sprites';
 import Sprite from './Sprite.astro';
 
 interface Props {
-  /** The newest upload as of the last build, or null if it could not be read. The Worker refreshes it live. */
+  /** The newest long-form upload in the committed snapshot, or null if none was ever captured. */
   video: Video | null;
 }
 
@@ -13,10 +13,6 @@ const { video } = Astro.props;
 const label = video ? `Play video: ${video.title}` : undefined;
 ---
 
-<!--
-  data-lv markers are the contract with worker/index.ts, which fills them in when the page is served:
-  [data-lv=video] / [data-lv=fallback] are shown or hidden, the rest receive the video's details.
--->
 <section class="tv-col" aria-labelledby="tv-heading">
   <div class="tv-stage">
     <div class="pets" aria-hidden="true">
@@ -29,24 +25,21 @@ const label = video ? `Play video: ${video.title}` : undefined;
     </div>
 
     <div class="tv">
-      <div class="screen" data-lv="player" data-video-id={video?.id ?? ''}>
-        <div class="video" data-lv="video" hidden={!video}>
-          <a class="video-link" data-lv="link" href={video ? watchUrl(video.id) : undefined} aria-label={label}>
-            <img
-              class="thumb"
-              data-lv="thumb"
-              src={video ? thumbPath(video.id) : undefined}
-              alt=""
-              width="320"
-              height="180"
-              decoding="async"
-            />
-            <span class="play"><Sprite sprite={sprites.play} /></span>
-          </a>
-        </div>
-        <div class="fallback" data-lv="fallback" hidden={!!video}>
-          <a class="fallback-link" href={site.youtubeChannelUrl} rel="noopener">Watch on YouTube</a>
-        </div>
+      <div class="screen" data-video-id={video?.id}>
+        {
+          video ? (
+            <div class="video">
+              <a class="video-link" href={watchUrl(video.id)} aria-label={label}>
+                <img class="thumb" src={thumbPath(video.id)} alt="" width="320" height="180" decoding="async" />
+                <span class="play"><Sprite sprite={sprites.play} /></span>
+              </a>
+            </div>
+          ) : (
+            <div class="fallback">
+              <a class="fallback-link" href={site.youtubeChannelUrl} rel="noopener">Watch on YouTube</a>
+            </div>
+          )
+        }
         <div class="crt" aria-hidden="true">
           <span class="scan"></span>
           <span class="glare"></span>
@@ -72,24 +65,29 @@ const label = video ? `Play video: ${video.title}` : undefined;
   </div>
 
   <h2 id="tv-heading" class="tv-heading">Newest on the channel</h2>
-  <div class="caption" data-lv="video" hidden={!video}>
-    <p class="tv-title" data-lv="title">{video?.title}</p>
-    <p class="tv-date">
-      <time data-lv="date" datetime={video?.published}>{video ? formatPublished(video.published) : ''}</time>
-    </p>
-  </div>
-  <p class="tv-note" data-lv="fallback" hidden={!!video}>See what's new on the channel.</p>
+  {
+    video ? (
+      <div class="caption">
+        <p class="tv-title">{video.title}</p>
+        <p class="tv-date">
+          <time datetime={video.published}>{formatPublished(video.published)}</time>
+        </p>
+      </div>
+    ) : (
+      <p class="tv-note">See what's new on the channel.</p>
+    )
+  }
 </section>
 
 <!-- Play on click: swaps the thumbnail for the player. Without JavaScript the link opens the video on YouTube. -->
 <script is:inline>
   document.addEventListener('click', function (e) {
-    var link = e.target.closest && e.target.closest('[data-lv="link"]');
-    var box = link && link.closest('[data-lv="player"]');
+    var link = e.target.closest && e.target.closest('.video-link');
+    var box = link && link.closest('.screen');
     var id = box && box.getAttribute('data-video-id');
     if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id) || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    var title = document.querySelector('[data-lv="title"]');
+    var title = document.querySelector('.tv-title');
     var f = document.createElement('iframe');
     f.className = 'embed';
     f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1';

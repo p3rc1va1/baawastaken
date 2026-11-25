@@ -11,7 +11,7 @@ import Motes from '../components/Motes.astro';
 import { getLatestVideo } from '../lib/latest-video';
 import { shelfOne, shelfTwo } from '../data/socials';
 
-const video = await getLatestVideo();
+const video = getLatestVideo();
 ---
 
 <Layout>

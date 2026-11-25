@@ -1,12 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "baawastaken",
-  "main": "worker/index.ts",
   "compatibility_date": "2026-11-22",
+  // Static assets only: no Worker runs for page views. If /api/* is added later, bring back "main"
+  // with "run_worker_first": ["/api/*"] so only that path invokes code.
   "assets": {
     "directory": "./dist",
-    "binding": "ASSETS",
-    "not_found_handling": "404-page",
-    "run_worker_first": ["/", "/yt-thumb/*"]
+    "not_found_handling": "404-page"
   }
 }

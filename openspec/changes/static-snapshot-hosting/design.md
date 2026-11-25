@@ -70,7 +70,7 @@
 ### Staying active
 - GitHub disables scheduled workflows in public repositories after 60 days without repository activity. Bot commits count as activity, but a quiet channel produces none.
 - A monthly step calls the GitHub API to re-enable the workflow (`PUT /repos/{owner}/{repo}/actions/workflows/youtube-sync.yml/enable`, which needs `actions: write`).
-- If task 1.2 shows that this doesn't reset the inactivity timer, the fallback is a monthly empty bot commit. That triggers one harmless redeploy.
+- **Decision (task 1.2)**: use the empty-commit method, not the enable call. GitHub's docs say scheduled workflows are disabled after 60 days without repository activity and describe re-enabling by UI, REST API or `gh workflow enable`, but they do not say that re-enabling an already-enabled workflow resets the timer; only third-party tools (for example gh-workflow-immortality) claim it. A commit is the documented kind of activity. `scripts/keepalive.sh` runs inside the sync workflow and adds one empty commit only if the newest commit is more than 45 days old, so it costs at most one harmless redeploy every 45 days of silence. Sources: docs.github.com "Disable and enable workflows"; GitHub's scheduled-event note on the 60-day rule.
 
 ## Risks / Trade-offs
 
@@ -78,7 +78,7 @@
 - **[Bot commits clutter history]** → Commits only happen on real change (a few a week), with a consistent `chore(youtube-sync)` prefix that's easy to filter (`git log --invert-grep --grep=youtube-sync`).
 - **[Race with the owner's pushes]** → Rebase before push, retry up to 3 times, never force-push.
 - **[The Shorts signal is not a documented API]** → Covered by fixture tests. If it disappears, Shorts may show on the TV, which degrades to the old behaviour without breaking anything.
-- **[A Cloudflare build doesn't start for a push made with `GITHUB_TOKEN`]** → Task 1.1 checks this first. If it fails, the workflow uses a deploy hook URL (a GitHub secret) after pushing.
+- **[A Cloudflare build doesn't start for a push made with `GITHUB_TOKEN`]** → Task 1.1 checks this first. If it fails, the workflow uses a deploy hook URL (a GitHub secret) after pushing. **Status (task 1.1)**: not yet confirmed. The reasoning in favour: GitHub suppresses *GitHub Actions* runs for `GITHUB_TOKEN` pushes, but Cloudflare's Git integration is triggered by the GitHub App's push webhook, which fires for any push. That needs one real bot commit to confirm; see tasks 4.3 and 6.1, and add a deploy hook step if no build appears in the Cloudflare deploy log.
 
 ## Migration Plan
 

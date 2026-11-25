@@ -13,7 +13,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    // Serve the built site through the real Worker so edge behaviour is exercised.
+    // Serve the built static assets the way Cloudflare does (including public/_headers).
     command: `npm run build && npx wrangler dev --port ${PORT} --ip 127.0.0.1`,
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: !process.env.CI,

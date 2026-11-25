@@ -3,18 +3,11 @@
   "include": [
     ".astro/types.d.ts",
     "src/**/*",
-    "worker/**/*",
     "scripts/**/*",
     "tests/**/*"
   ],
   "exclude": [
     "dist",
     "node_modules"
-  ],
-  "compilerOptions": {
-    "types": [
-      "@cloudflare/workers-types",
-      "@cloudflare/vitest-plugin/types"
-    ]
-  }
+  ]
 }

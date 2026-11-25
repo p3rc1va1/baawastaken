@@ -2,7 +2,7 @@
 
 The home page of **BaaWasTaken**: a cozy pixel-art room with a shelf of links to every channel (YouTube, Twitch, Kick, Discord, Instagram, TikTok, Ko-fi), a TV showing the newest YouTube upload, and a "Say hi" card.
 
-It is a static [Astro](https://astro.build) site served from [Cloudflare Workers](https://developers.cloudflare.com/workers/static-assets/). A tiny Worker adds the latest video to the page and serves its thumbnail. Everything else is plain files.
+It is a static [Astro](https://astro.build) site served from [Cloudflare](https://developers.cloudflare.com/workers/static-assets/) as plain static files: no code runs when someone visits. A scheduled GitHub Actions job keeps the latest YouTube video up to date (see below).
 
 ## Run it
 
@@ -13,7 +13,7 @@ npm install
 npm run dev          # http://localhost:4321, with hot reload
 ```
 
-`npm run dev` shows the video that was current when the page loaded. To run the real thing, Worker included, build first and serve it with Wrangler:
+`npm run dev` shows the video in the committed snapshot (`src/data/youtube.json`). To serve the built site the way Cloudflare does (including `public/_headers`), build first and use Wrangler:
 
 ```sh
 npm run build
@@ -26,9 +26,10 @@ npx wrangler dev     # http://localhost:8787
 |---|---|
 | `npm run dev` | Astro dev server |
 | `npm run build` | Builds the site into `dist/` |
-| `npm run preview` | Serves `dist/` without the Worker |
-| `npm run check` | Type-checks the site and the Worker |
-| `npm test` | Unit tests (Node, plus the Workers runtime for the Worker) |
+| `npm run preview` | Serves `dist/` with Astro's preview server |
+| `npm run sync` | Runs the YouTube sync once (same as the scheduled job) |
+| `npm run check` | Type-checks the site, scripts and tests |
+| `npm test` | Unit tests |
 | `npm run test:e2e` | Browser tests against `wrangler dev` (builds first) |
 | `npm run avatar` | Regenerates the avatar and favicons from `media/channel profile image.png` |
 | `npm run og` | Builds the site and regenerates the share image `public/og.png` |
@@ -49,20 +50,28 @@ The first time you run the browser tests, install the browser: `npx playwright i
 
 After changing the share image's look (`src/pages/og.astro`), run `npm run og` and commit the new `public/og.png`.
 
-## How the latest video gets onto the page
+## How the latest video gets onto the page (YouTube sync)
 
-1. When the site is built, it reads the channel's public RSS feed once and bakes the newest video into the HTML. If YouTube cannot be reached, the build still succeeds and the TV shows a "Watch on YouTube" link instead.
-2. When someone loads the page, the Worker (`worker/index.ts`) reads the feed again, remembers the answer for 30 minutes, and swaps the current video into the page. A new upload shows up within about half an hour, with no deploy.
-3. If YouTube is slow or down, visitors get the page as it was built (or the last video the Worker saw). A failure is remembered for a minute so nobody waits for it.
-4. The thumbnail comes from `/yt-thumb/<id>`, which the Worker fetches from YouTube and serves from our own domain, so visitors' browsers never contact YouTube until they press play. The player only loads after a click, from `youtube-nocookie.com`.
+A GitHub Actions workflow, `.github/workflows/youtube-sync.yml`, runs `scripts/youtube-sync.ts` about every 5 minutes (cron `2-59/5 * * * *`; GitHub's scheduler is best-effort, so runs can be late):
 
-**To stop the live update**, remove `"/"` from `run_worker_first` in `wrangler.jsonc`. The page is then served exactly as built, and its video changes only when you deploy. Keep `"/yt-thumb/*"`: the thumbnail still needs the Worker.
+1. It reads the channel's public RSS feed and picks the newest **long-form** upload. Shorts (links under `/shorts/`) are skipped.
+2. It stores that video's thumbnail as `public/yt/<id>.jpg` and writes `src/data/youtube.json`. Once an hour it re-downloads the thumbnail to catch a replaced one, and it deletes thumbnails no longer used.
+3. **Only if something changed**, it commits to `main` as `github-actions[bot]` with a `chore(youtube-sync): …` message. That push triggers the normal Cloudflare deploy, so a new video shows on the TV roughly 10–25 minutes after upload.
+4. The site build reads only `src/data/youtube.json`. It never contacts YouTube, so a YouTube outage cannot fail or slow a deploy. If YouTube is down, the sync fails quietly and the last video stays up. If no video was ever captured, the TV shows a "Watch on YouTube" link.
 
-The Worker may only export its handler. Settings and helpers live in `worker/config.ts`; a test checks this, because any other export stops the Workers runtime from starting.
+Visitors' browsers never contact YouTube until they press play (the thumbnail is our own static file; the player loads from `youtube-nocookie.com` after a click).
+
+**Start it by hand:** GitHub → Actions → `youtube-sync` → *Run workflow* on `main`. Or locally: `npm run sync`, then commit `src/data/youtube.json` and `public/yt/`. The log's first line shows the latest video ID.
+
+**Read its commits:** they all start with `chore(youtube-sync)`. To hide them: `git log --invert-grep --grep='chore(youtube-sync)'`.
+
+**If GitHub disables it:** GitHub turns scheduled workflows off after 60 days with no repository activity. The workflow guards against this: when the newest commit is more than 45 days old, a run adds one empty commit (`scripts/keepalive.sh`). If it was switched off anyway, open Actions → `youtube-sync` → *Enable workflow*, then run it once.
+
+**Later, if you need code per request** (view counts, likes), add it under `/api/*` only: put `main` back in `wrangler.jsonc` with `run_worker_first: ["/api/*"]`. No page may depend on it to render.
 
 ## Deploying
 
-Cloudflare builds and deploys every push to `main` (Workers Builds: build `npm run build`, deploy `npx wrangler deploy`). A failed build leaves the previous version live.
+Cloudflare builds and deploys every push to `main` (Workers Builds: build `npm run build`, deploy `npx wrangler deploy`), including the sync bot's commits. The deploy is static assets only. A failed build leaves the previous version live.
 
 **To roll back**, open Cloudflare → Workers & Pages → `baawastaken` → Deployments, pick an earlier version and roll back to it. Or revert the commit on `main`.
 
@@ -76,10 +85,11 @@ src/components/   Header, Shelf, LinkTile, LatestVideoTV, ContactCard, Room, ...
 src/sprites/      pixel art as text
 src/data/         links and site text
 src/styles/       tokens.css, base.css, motion.css
-worker/           the edge Worker (index.ts, feed.ts, config.ts)
-scripts/          avatar and share-image generators
-public/           favicons, share image, _headers, robots.txt
-tests/            unit tests; tests/worker runs in the Workers runtime; tests/e2e drives a real browser
+src/lib/youtube/ feed parser and snapshot format (shared by the build and the sync)
+scripts/          YouTube sync, keep-alive, avatar and share-image generators
+.github/          the youtube-sync workflow
+public/           favicons, share image, _headers, robots.txt, yt/ (synced thumbnails)
+tests/            unit tests; tests/e2e drives a real browser
 openspec/         the plan this site was built from
 ```
 

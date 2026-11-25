@@ -5,27 +5,57 @@ import {
   formatPublished,
   isVideoId,
   parseLatestVideo,
+  parseVideos,
   thumbPath,
   thumbSource,
   unescapeXml,
   watchUrl,
-} from '../worker/feed';
+} from '../src/lib/youtube/feed.ts';
 import { root } from './helpers';
 
 const fixture = readFileSync(`${root}tests/fixtures/feed.xml`, 'utf8');
 
 const entry = (id: string, title: string, published: string) =>
   `<entry><yt:videoId>${id}</yt:videoId><title>${title}</title><published>${published}</published></entry>`;
+const short = (id: string, title: string, published: string) =>
+  `<entry><yt:videoId>${id}</yt:videoId><title>${title}</title><link rel="alternate" href="https://www.youtube.com/shorts/${id}"/><published>${published}</published></entry>`;
 const feed = (...entries: string[]) => `<feed><title>Channel</title>${entries.join('')}</feed>`;
 
 describe('parseLatestVideo', () => {
-  test('picks the newest entry, ignoring feed-level fields and media:title decoys', () => {
-    const video = parseLatestVideo(fixture);
-    expect(video).toEqual({
-      id: 'bbbbbbbbbbb',
-      title: 'Tom & Jerry\'s "big" day \u{1F9F9} <3',
-      published: '2026-11-21T18:18:14.000Z',
+  test('picks the newest long-form entry, ignoring feed-level fields, media:title decoys and Shorts', () => {
+    expect(parseLatestVideo(fixture)).toEqual({
+      id: 'ccccccccccc',
+      title: 'Middle video',
+      published: '2026-11-15T12:00:00.000Z',
     });
+  });
+
+  test('parseVideos decodes every entry and flags Shorts by their /shorts/ link', () => {
+    const all = parseVideos(fixture);
+    expect(all.map((v) => [v.id, v.isShort])).toEqual([
+      ['aaaaaaaaaaa', false],
+      ['bbbbbbbbbbb', true],
+      ['ccccccccccc', false],
+    ]);
+    expect(all[1]!.title).toBe('Tom & Jerry\'s "big" day \u{1F9F9} <3');
+  });
+
+  test('newest entry is a Short: the newest long-form video is used', () => {
+    const xml = feed(
+      entry('aaaaaaaaaaa', 'Long old', '2026-01-01T00:00:00Z'),
+      short('bbbbbbbbbbb', 'Short new', '2026-03-01T00:00:00Z'),
+    );
+    expect(parseLatestVideo(xml)?.id).toBe('aaaaaaaaaaa');
+  });
+
+  test('all entries are Shorts: no latest video', () => {
+    expect(parseLatestVideo(feed(short('aaaaaaaaaaa', 'S1', '2026-01-01T00:00:00Z')))).toBeNull();
+  });
+
+  test('no Shorts: behaves as before', () => {
+    const xml = feed(entry('aaaaaaaaaaa', 'A', '2026-01-01T00:00:00Z'), entry('bbbbbbbbbbb', 'B', '2026-02-01T00:00:00Z'));
+    expect(parseLatestVideo(xml)?.id).toBe('bbbbbbbbbbb');
+    expect(parseVideos(xml).every((v) => !v.isShort)).toBe(true);
   });
 
   test('chooses by publish date, not by position in the feed', () => {
@@ -124,11 +154,11 @@ describe('helpers', () => {
   test('URLs', () => {
     expect(feedUrl('UC-abc')).toBe('https://www.youtube.com/feeds/videos.xml?channel_id=UC-abc');
     expect(watchUrl('aaaaaaaaaaa')).toBe('https://www.youtube.com/watch?v=aaaaaaaaaaa');
-    expect(thumbPath('aaaaaaaaaaa')).toBe('/yt-thumb/aaaaaaaaaaa');
+    expect(thumbPath('aaaaaaaaaaa')).toBe('/yt/aaaaaaaaaaa.jpg');
     expect(thumbSource('aaaaaaaaaaa')).toBe('https://i.ytimg.com/vi/aaaaaaaaaaa/mqdefault.jpg');
   });
 
-  test('dates are formatted in UTC, the same on the build machine and at the edge', () => {
+  test('dates are formatted in UTC, the same on every machine', () => {
     expect(formatPublished('2026-11-21T18:18:14.000Z')).toBe('Nov 21, 2026');
     expect(formatPublished('2026-11-21T23:59:59.000Z')).toBe('Nov 21, 2026');
     expect(formatPublished('2026-11-22T00:00:00.000Z')).toBe('Nov 22, 2026');

@@ -1,4 +1,4 @@
-# Applies to every static file. (The homepage's HTML also passes through here before the Worker adds the latest video.)
+# Applies to every static file. The whole site is static: no code runs for page views.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
@@ -18,3 +18,7 @@
   Cache-Control: public, max-age=86400
 /og.png
   Cache-Control: public, max-age=86400
+
+# Video thumbnails are named by video ID, but a replaced thumbnail keeps its name, so cache for an hour.
+/yt/*
+  Cache-Control: public, max-age=3600

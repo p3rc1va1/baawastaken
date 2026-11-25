@@ -1,28 +1,16 @@
-import { feedUrl, parseLatestVideo, type Video } from '../../worker/feed';
-import { site } from '../data/site';
+import snapshotJson from '../data/youtube.json?raw';
+import type { Video } from './youtube/feed.ts';
+import { parseSnapshot, type Snapshot } from './youtube/snapshot.ts';
 
 export type { Video };
 
 /**
- * The newest upload, read from the channel feed at build time. This is the snapshot baked into the
- * static page; the Worker refreshes it when the page is served. It never throws: any failure (offline,
- * timeout, HTTP error, unreadable feed) returns null and the build carries on with the fallback.
+ * The newest long-form upload, read from the committed YouTube snapshot (src/data/youtube.json, kept
+ * up to date by scripts/youtube-sync.ts). It does no network I/O, so a build never depends on YouTube.
+ * Returns null when no video was ever captured; the TV then shows its "Watch on YouTube" fallback.
  */
-export async function getLatestVideo(
-  opts: { fetchFn?: typeof fetch; timeoutMs?: number } = {},
-): Promise<Video | null> {
-  const { fetchFn = fetch, timeoutMs = 5000 } = opts;
-  try {
-    const res = await fetchFn(feedUrl(site.youtubeChannelId), { signal: AbortSignal.timeout(timeoutMs) });
-    if (!res.ok) {
-      console.warn(`[latest-video] feed responded ${res.status}; building without a snapshot`);
-      return null;
-    }
-    const video = parseLatestVideo(await res.text());
-    if (!video) console.warn('[latest-video] feed had no usable entries; building without a snapshot');
-    return video;
-  } catch (error) {
-    console.warn(`[latest-video] could not read the feed (${(error as Error).message}); building without a snapshot`);
-    return null;
-  }
+export function getLatestVideo(snapshot: Snapshot = parseSnapshot(snapshotJson)): Video | null {
+  const id = snapshot.latest;
+  const v = id === null ? undefined : snapshot.videos[id];
+  return id !== null && v ? { id, title: v.title, published: v.published } : null;
 }

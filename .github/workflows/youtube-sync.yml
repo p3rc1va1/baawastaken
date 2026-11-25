@@ -1,0 +1,62 @@
+name: youtube-sync
+
+# Captures the channel's newest long-form video (and its thumbnail) into the repo. A push to main
+# triggers the normal Cloudflare deploy. See README.md ("YouTube sync").
+on:
+  schedule:
+    - cron: '2-59/5 * * * *' # every 5 minutes, off the busy top-of-hour slots
+  workflow_dispatch:
+
+concurrency:
+  group: youtube-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Sync from YouTube
+        run: node scripts/youtube-sync.ts
+
+      - name: Commit and push changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add src/data/youtube.json public/yt
+            git commit -m "chore(youtube-sync): update from YouTube"
+          else
+            echo "No change in YouTube data."
+            # Keep the schedule alive during quiet periods (empty commit only if the repo is silent for 45+ days).
+            bash scripts/keepalive.sh
+          fi
+
+          if [[ "$(git rev-list --count origin/main..HEAD)" == "0" ]]; then
+            echo "Nothing to push."
+            exit 0
+          fi
+
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; retrying."
+            sleep $((attempt * 3))
+          done
+          echo "Could not push after 3 attempts." >&2
+          exit 1

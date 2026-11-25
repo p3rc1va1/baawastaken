@@ -56,7 +56,7 @@ describe('site data', () => {
     ];
     const files = [
       ...walk(`${root}src`, ['.astro', '.ts', '.css']).filter((f) => !f.includes('/src/data/')),
-      ...walk(`${root}worker`, ['.ts']),
+      ...walk(`${root}scripts`, ['.ts']),
     ];
     const offenders: string[] = [];
     for (const file of files) {
